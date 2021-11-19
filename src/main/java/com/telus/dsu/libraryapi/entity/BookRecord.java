@@ -23,9 +23,9 @@ public class BookRecord {
     private Integer transaction;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate tookOn;
-    private LocalDate returnOn;
-    private LocalDate dueDate;
+    private Date tookOn;
+    private Date returnOn;
+    private Date dueDate;
     private Boolean isReturned;
     private Integer renewalCont;
     private Double delayPenalization;
@@ -41,6 +41,6 @@ public class BookRecord {
     }
 
     @PrePersist
-    protected void onCreate() {this.tookOn = LocalDate.now();}
+    protected void onCreate() {this.tookOn = new Date();}
 
 }

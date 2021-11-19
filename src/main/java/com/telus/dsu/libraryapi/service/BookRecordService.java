@@ -11,6 +11,7 @@ import com.telus.dsu.libraryapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
@@ -51,7 +52,18 @@ public class BookRecordService {
         if(user.getBorrowedBooks()>3){
             throw new ResourceNotCreatedException("User has already borrow 3 books");
         }else{
-            bookRecord.setDueDate(LocalDate.now().plusDays(7));
+            DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+            Date currentDate = new Date();
+            dateFormat.format(currentDate);
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(currentDate);
+
+            c.add(Calendar.DATE, 7);
+
+            Date currentDataPlusSeven = c.getTime();
+
+            bookRecord.setDueDate(currentDataPlusSeven);
             bookRecord.setRenewalCont(1);
             bookRecord.setIsReturned(false);
             bookRecord.setUser(user);

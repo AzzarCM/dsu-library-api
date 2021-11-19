@@ -17,7 +17,7 @@ public class BookRecordService {
         return bookRecordRepository.findAll();
     }
 
-    public BookRecord getBookRecordById(Integer transaction){
+    public BookRecord getBookRecordByTransaction(Integer transaction){
         return bookRecordRepository.findBookRecordByTransaction(transaction);
     }
 

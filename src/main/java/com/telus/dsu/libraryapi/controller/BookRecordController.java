@@ -35,7 +35,7 @@ public class BookRecordController {
 
     @GetMapping("/{transaction}")
     public ResponseEntity<?> getBookRecordByTransaction(@PathVariable Integer transaction){
-        BookRecord bookRecordFound = bookRecordService.getBookRecordById(transaction);
+        BookRecord bookRecordFound = bookRecordService.getBookRecordByTransaction(transaction);
         if(bookRecordFound == null){
             throw new ResourceNotFoundException("BookRecord not found with Transaction: " + transaction);
         }else{
@@ -45,16 +45,31 @@ public class BookRecordController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> createNewBookRecord(@Valid @RequestBody BookRecordDTO bookRecordDTO, BindingResult result){
+    public ResponseEntity<?> createNewBookRecord(@Valid @RequestBody BookRecord bookRecord, BindingResult result){
         if(result.hasErrors()){
             throw new ResourceNotCreatedException("BookRecord was not created");
         }else{
-            BookRecord bookRecord = bookRecordService.createBookRecord(convertToEntity(bookRecordDTO));
-            return new ResponseEntity<BookRecordDTO>(convertToDTO(bookRecord), HttpStatus.OK);
+            BookRecord newBookRecord = bookRecordService.createBookRecord(bookRecord);
+            return new ResponseEntity<BookRecordDTO>(convertToDTO(newBookRecord), HttpStatus.OK);
         }
     }
 
-    //TODO PUT DELETE
+    @PutMapping("/{transaction}")
+    public ResponseEntity<?> updateBookRecord(@Valid @RequestBody BookRecord bookRecord, BindingResult result, @PathVariable Integer transaction){
+        BookRecord bookRecordToUpdate = bookRecordService.getBookRecordByTransaction(transaction);
+        if(result.hasErrors() || bookRecordToUpdate == null){
+            throw new ResourceNotFoundException("Book Record not found with User Code: " + transaction);
+        }else{
+            BookRecord updatedBookRecord = bookRecordService.updateBookRecord(bookRecordToUpdate, bookRecord);
+            return new ResponseEntity<BookRecordDTO>(convertToDTO(updatedBookRecord), HttpStatus.OK);
+        }
+    }
+
+    @DeleteMapping("{transaction}")
+    public ResponseEntity<?> deleteBookRecord(@PathVariable Integer transaction){
+        bookRecordService.deleteBookRecord(transaction);
+        return new ResponseEntity<>("BookRecord with transaction " + transaction + " deleted", HttpStatus.OK);
+    }
 
     private List<BookRecordDTO> convertListToDTO(List<BookRecord> bookRecords){
         List<BookRecordDTO> bookRecordDTOList = new ArrayList<>();

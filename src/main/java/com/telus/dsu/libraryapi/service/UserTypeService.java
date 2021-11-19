@@ -21,5 +21,9 @@ public class UserTypeService {
         return userTypeRepository.findByUserTypeId(userTypeId);
     }
 
+    public UserType createUser(UserType userType){
+        return userTypeRepository.save(userType);
+    }
+
     //TODO Create, Delete and Update
 }

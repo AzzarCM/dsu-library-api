@@ -49,7 +49,7 @@ public class UserController {
             throw new ResourceNotCreatedException("User was not created");
         }else{
             User newUser = userService.createUser(user);
-            return new ResponseEntity<UserDTO>(convertToDTO(newUser), HttpStatus.CREATED);
+            return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
         }
     }
 

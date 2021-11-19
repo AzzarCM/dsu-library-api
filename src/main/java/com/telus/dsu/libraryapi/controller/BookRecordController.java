@@ -44,12 +44,15 @@ public class BookRecordController {
         }
     }
 
-    @PostMapping("")
-    public ResponseEntity<?> createNewBookRecord(@Valid @RequestBody BookRecord bookRecord, BindingResult result){
+    @PostMapping("/{isbn}/{userCode}")
+    public ResponseEntity<?> createNewBookRecord(@Valid @RequestBody BookRecord bookRecord,
+                                                 @PathVariable String isbn,
+                                                 @PathVariable Integer userCode,
+                                                 BindingResult result){
         if(result.hasErrors()){
             throw new ResourceNotCreatedException("BookRecord was not created");
         }else{
-            BookRecord newBookRecord = bookRecordService.createBookRecord(bookRecord);
+            BookRecord newBookRecord = bookRecordService.createBookRecord(bookRecord,isbn,userCode);
             return new ResponseEntity<BookRecordDTO>(convertToDTO(newBookRecord), HttpStatus.OK);
         }
     }

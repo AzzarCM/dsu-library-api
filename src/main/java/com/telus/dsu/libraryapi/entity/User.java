@@ -1,20 +1,21 @@
 package com.telus.dsu.libraryapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @ToString
 public class User {
+
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,5 +28,18 @@ public class User {
     private String email;
     private String phone;
 
-    //TODO UserTypeRelation
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "USERTYPE_ID")
+    private UserType userType;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookRecord> bookRecordList;
+
+    public User(Integer userId) {
+        this.userId = userId;
+    }
+
+    public User() {
+
+    }
 }

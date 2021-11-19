@@ -14,5 +14,10 @@ public class UserDTO {
     private Integer borrowedBooks;
     private String email;
     private String phone;
+    private Integer userTypeId;
+
+    public UserDTO() {
+    }
+
     //TODO UserType
 }

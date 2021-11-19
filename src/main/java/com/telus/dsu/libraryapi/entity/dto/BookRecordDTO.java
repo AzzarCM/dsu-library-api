@@ -17,4 +17,6 @@ public class BookRecordDTO {
     private Boolean isReturned;
     private Integer renewalCont;
     private Double delayPenalization;
+    private Integer bookId;
+    private Integer userId;
 }

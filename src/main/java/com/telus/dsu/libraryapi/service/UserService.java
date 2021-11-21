@@ -1,8 +1,11 @@
 package com.telus.dsu.libraryapi.service;
 
 import com.telus.dsu.libraryapi.entity.User;
+import com.telus.dsu.libraryapi.entity.UserType;
+import com.telus.dsu.libraryapi.exception.ResourceNotCreatedException;
 import com.telus.dsu.libraryapi.exception.ResourceNotFoundException;
 import com.telus.dsu.libraryapi.repository.UserRepository;
+import com.telus.dsu.libraryapi.repository.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +17,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserTypeRepository userTypeRepository;
+
     public List<User> getUsers() {
         return userRepository.findAll();
     }
@@ -23,7 +29,17 @@ public class UserService {
     }
 
     public User createUser(User user){
-        return userRepository.save(user);
+        UserType userType = userTypeRepository.findByUserTypeId(user.getUserType().getUserTypeId());
+        if(userType == null){
+            throw new ResourceNotFoundException("User type with id: "+ user.getUserType().getUserTypeId() + " does not exist");
+        }
+        try{
+            user.setUserType(userType);
+            return userRepository.save(user);
+        }catch (Exception e){
+            throw new ResourceNotCreatedException("User with ID: "+user.getUserCode()+ " already exist");
+        }
+
     }
 
     public User updateUser(User toUpdateUser, User user){

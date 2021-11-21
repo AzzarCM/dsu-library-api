@@ -1,6 +1,7 @@
 package com.telus.dsu.libraryapi.service;
 
 import com.telus.dsu.libraryapi.entity.UserType;
+import com.telus.dsu.libraryapi.exception.ResourceNotCreatedException;
 import com.telus.dsu.libraryapi.repository.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,12 @@ public class UserTypeService {
     }
 
     public UserType createUser(UserType userType){
-        return userTypeRepository.save(userType);
+        try{
+            return userTypeRepository.save(userType);
+        }catch (Exception e){
+            throw new ResourceNotCreatedException("User type "+userType.getUserType()+" already exist");
+        }
+
     }
 
     //TODO Create, Delete and Update

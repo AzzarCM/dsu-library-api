@@ -1,6 +1,7 @@
 package com.telus.dsu.libraryapi.service;
 
 import com.telus.dsu.libraryapi.entity.Book;
+import com.telus.dsu.libraryapi.exception.ResourceNotCreatedException;
 import com.telus.dsu.libraryapi.exception.ResourceNotFoundException;
 import com.telus.dsu.libraryapi.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,12 @@ public class BookService {
     }
 
     public Book createBook(Book book){
-        return bookRepository.save(book);
+        try{
+            return bookRepository.save(book);
+        }catch (Exception e){
+            throw new ResourceNotCreatedException("Book with ISBN: "+book.getIsbn()+" already exist");
+        }
+
     }
     public Book getBookByIsbn(String isbn){
         return bookRepository.findBookByIsbn(isbn);

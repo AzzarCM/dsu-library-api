@@ -20,6 +20,7 @@ public class UserType {
     @Column(name = "USERTYPE_ID")
     private Integer userTypeId;
 
+    @Column(name = "USER_TYPE", unique = true)
     @NotNull(message = "the UserType is required")
     private String userType;
 

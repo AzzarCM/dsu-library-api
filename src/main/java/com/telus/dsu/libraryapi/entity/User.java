@@ -20,6 +20,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
+    @Column(name = "USER_CODE", unique = true, updatable = false)
     @NotNull(message = "the UserCode is required")
     private Integer userCode;
     private String firstName;

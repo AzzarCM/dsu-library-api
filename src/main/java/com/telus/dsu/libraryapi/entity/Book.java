@@ -18,6 +18,8 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer bookId;
     private String title;
+
+    @Column(name = "isbn", updatable = false, unique = true)
     @NotNull(message = "the ISBN is required")
     private String isbn;
     private String author;

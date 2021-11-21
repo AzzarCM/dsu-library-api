@@ -20,6 +20,7 @@ import java.util.List;
 
 @Service
 public class BookRecordService {
+
     @Autowired
     private BookRecordRepository bookRecordRepository;
 

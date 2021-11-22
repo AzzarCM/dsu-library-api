@@ -1,6 +1,7 @@
 package com.telus.dsu.libraryapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -30,11 +31,10 @@ public class BookRecord {
     private Boolean isReturned;
     private Integer renewalCont;
     private Double delayPenalization;
-
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     private Book book;
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 

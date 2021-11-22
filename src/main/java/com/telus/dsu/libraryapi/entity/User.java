@@ -31,6 +31,7 @@ public class User {
     @JoinColumn(name = "USERTYPE_ID")
     private UserType userType;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<BookRecord> bookRecordList;
 

@@ -57,6 +57,22 @@ public class BookRecordController {
         }
     }
 
+    @PostMapping("/return/{invoice}/{isbn}/{userCode}")
+    public ResponseEntity<?> returnBook (@PathVariable Integer invoice,
+                                         @PathVariable String isbn,
+                                         @PathVariable Integer userCode){
+        BookRecord record = bookRecordService.returnBook(invoice,isbn,userCode);
+        return new ResponseEntity<>(record, HttpStatus.OK);
+    }
+
+    @PostMapping("/renew/{invoice}/{isbn}/{userCode}")
+    public ResponseEntity<?> renewBook(@PathVariable Integer invoice,
+                                       @PathVariable String isbn,
+                                       @PathVariable Integer userCode){
+        BookRecord record = bookRecordService.renewBook(invoice,isbn,userCode);
+        return new ResponseEntity<>(record,HttpStatus.OK);
+    }
+
     @PutMapping("/{transaction}")
     public ResponseEntity<?> updateBookRecord(@Valid @RequestBody BookRecord bookRecord, BindingResult result, @PathVariable Integer transaction){
         BookRecord bookRecordToUpdate = bookRecordService.getBookRecordByTransaction(transaction);

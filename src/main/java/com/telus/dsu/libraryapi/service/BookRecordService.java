@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -49,7 +50,7 @@ public class BookRecordService {
             throw new ResourceNotFoundException("User with code #" + userCode + " does not exist");
         } else if (!book.getIsAvailable()) {
             throw new ResourceNotCreatedException("Book is not available");
-        } else if (user.getBorrowedBooks() >= Constants.MAX_RENEWALS) {
+        } else if (user.getBorrowedBooks() >= Constants.MAX_BOOKS_PER_USER) {
             throw new ResourceNotCreatedException("User has already borrow 3 books");
         }
 
@@ -126,7 +127,7 @@ public class BookRecordService {
         bookRecord.setDueDate(dueDateUpdated);
         bookRecord.setRenewalCont(bookRecord.getRenewalCont()+1);
 
-        if(bookRecord.getRenewalCont() >= 3){
+        if(bookRecord.getRenewalCont() >= Constants.MAX_RENEWALS){
             bookRecord.setReturnOn(renewOn);
             bookRecord.setIsReturned(true);
             book.setIsAvailable(true);
@@ -149,9 +150,14 @@ public class BookRecordService {
 
     public void deleteBookRecord(Integer transaction) {
         BookRecord bookRecordFound = bookRecordRepository.findBookRecordByTransaction(transaction);
+
         if (bookRecordFound == null) {
             throw new ResourceNotFoundException("BookRecord not found with BookRecordId: " + transaction);
         } else {
+            User user = userRepository.findByUserId(bookRecordFound.getUser().getUserId());
+            user.setBorrowedBooks(user.getBorrowedBooks()-1);
+            Book book = bookRepository.findByBookId(bookRecordFound.getBook().getBookId());
+            book.setIsAvailable(true);
             bookRecordRepository.delete(bookRecordFound);
         }
     }

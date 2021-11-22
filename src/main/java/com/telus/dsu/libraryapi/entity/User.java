@@ -21,10 +21,15 @@ public class User {
     @Column(name = "USER_CODE", unique = true, updatable = false)
     @NotNull(message = "the UserCode is required")
     private Integer userCode;
+    @NotNull(message = "The first name is required")
     private String firstName;
+    @NotNull(message = "The last name is required")
     private String lastName;
+
     private Integer borrowedBooks;
+    @NotNull(message = "the email is required")
     private String email;
+    @NotNull(message = "the phone is required")
     private String phone;
 
     @ManyToOne(fetch = FetchType.EAGER)

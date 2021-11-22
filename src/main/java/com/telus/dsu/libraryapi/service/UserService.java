@@ -47,8 +47,8 @@ public class UserService {
         toUpdateUser.setLastName(user.getLastName());
         toUpdateUser.setBorrowedBooks(user.getBorrowedBooks());
         toUpdateUser.setEmail(user.getEmail());
-        toUpdateUser.setEmail(user.getEmail());
-        //TODO Set UserType
+        toUpdateUser.setPhone(user.getPhone());
+        toUpdateUser.setUserType(user.getUserType());
 
         return userRepository.save(toUpdateUser);
     }

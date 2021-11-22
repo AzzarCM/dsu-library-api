@@ -1,5 +1,6 @@
 package com.telus.dsu.libraryapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -26,6 +27,7 @@ public class Book {
     private String category;
     private Boolean isAvailable;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "book")
     private List<BookRecord> bookRecordList;
 

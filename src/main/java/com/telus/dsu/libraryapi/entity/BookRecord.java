@@ -19,6 +19,7 @@ public class BookRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer recordId;
 
+    @Column(name = "TRANSACTION_NUMBER", unique = true)
     @NotNull(message = "number of transaction is required")
     private Integer transaction;
 
@@ -31,10 +32,10 @@ public class BookRecord {
     private Double delayPenalization;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Book book;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
     public BookRecord() {

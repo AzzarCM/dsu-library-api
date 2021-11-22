@@ -15,8 +15,6 @@ import java.util.List;
 @ToString
 public class User {
 
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;

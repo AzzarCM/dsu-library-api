@@ -52,16 +52,8 @@ public class BookRecordService {
         } else if (user.getBorrowedBooks() >= Constants.MAX_RENEWALS) {
             throw new ResourceNotCreatedException("User has already borrow 3 books");
         }
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        Date currentDate = new Date();
-        dateFormat.format(currentDate);
 
-        Calendar c = Calendar.getInstance();
-        c.setTime(currentDate);
-
-        c.add(Calendar.DATE, 7);
-
-        Date currentDataPlusSeven = c.getTime();
+        Date currentDataPlusSeven = sumSevenDays(new Date());
 
         bookRecord.setDueDate(currentDataPlusSeven);
         bookRecord.setRenewalCont(0);
@@ -81,35 +73,20 @@ public class BookRecordService {
         BookRecord bookRecord = bookRecordRepository.findBookRecordByTransaction(invoice);
         Book book = bookRepository.findBookByIsbn(isbn);
         User user = userRepository.findByUserCode(userCode);
-
-        if (bookRecord == null) {
-            throw new ResourceNotCreatedException("The invoice #" + invoice + " does not exist");
-        } else if (book == null) {
-            throw new ResourceNotFoundException("The book with ISBN: " + isbn + " does not exists");
-        } else if (user == null) {
-            throw new ResourceNotFoundException("The user with id: " + userCode + " does not exists");
-        }
-        if (bookRecord.getIsReturned()) {
-            throw new ResourceNotCreatedException("The book: " + book.getTitle() + " was already returned");
-        }
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        Calendar c = Calendar.getInstance();
-
+        validateEntries(bookRecord,book,user,invoice,isbn,userCode);
         user.setBorrowedBooks(user.getBorrowedBooks() - 1);
         book.setIsAvailable(true);
         bookRecord.setIsReturned(true);
         bookRecord.setReturnOn(new Date());
+
         Date tookOn = bookRecord.getTookOn();
-        Date dueDate = bookRecord.getDueDate();
+        Date dueDate = (Date) bookRecord.getDueDate();
         Date returnOn = new Date();
-        dateFormat.format(returnOn);
-        c.setTime(returnOn);
-        c.add(Calendar.DATE, 10);
-        Date realReturn = c.getTime();
-        Long difference = getDifferenceBetweenDays(realReturn, tookOn);
+
+        Long difference = getDifferenceBetweenDays(tookOn, returnOn);
         if (difference > 7) {
-            Long diffForPenalization = getDifferenceBetweenDays(realReturn, dueDate);
-            bookRecord.setDelayPenalization((diffForPenalization) * 0.20);
+            Long diffForPenalization = getDifferenceBetweenDays(dueDate, returnOn);
+            bookRecord.setDelayPenalization((diffForPenalization) * Constants.PENALIZATION);
         }
         return bookRecordRepository.save(bookRecord);
     }
@@ -118,52 +95,39 @@ public class BookRecordService {
         BookRecord bookRecord = bookRecordRepository.findBookRecordByTransaction(invoice);
         Book book = bookRepository.findBookByIsbn(isbn);
         User user = userRepository.findByUserCode(userCode);
-        if (bookRecord == null) {
-            throw new ResourceNotCreatedException("The invoice #" + invoice + " does not exist");
-        } else if (book == null) {
-            throw new ResourceNotFoundException("The book with ISBN: " + isbn + " does not exists");
-        } else if (user == null) {
-            throw new ResourceNotFoundException("The user with id: " + userCode + " does not exists");
-        } else if (bookRecord.getIsReturned()) {
-            throw new ResourceNotCreatedException("The book: " + book.getTitle() + " was already returned");
-        }
+
+        validateEntries(bookRecord,book,user,invoice,isbn,userCode);
+
+        Date dueDateUpdated = sumSevenDays(new Date());
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Calendar c = Calendar.getInstance();
-        Date dueDateUpdated = new Date();
-        dateFormat.format(dueDateUpdated);
-
-        c.setTime(dueDateUpdated);
-        c.add(Calendar.DATE,10);
 
         Date tookOn = bookRecord.getTookOn();
         Date dueDate = bookRecord.getDueDate();
-        Date returnOn = new Date();
-        dateFormat.format(returnOn);
-        c.setTime(returnOn);
-        c.add(Calendar.DATE, 10);
-        Date realReturn2 = c.getTime();
-        Long differenceBefore = getDifferenceBetweenDays(realReturn2,tookOn);
+        Date renewOn = new Date();
+//        dateFormat.format(renewOn);
+//        c.setTime(renewOn);
+//        c.add(Calendar.DATE, 7);
+//        Date realReturn = c.getTime();
+        Long differenceBefore = getDifferenceBetweenDays(tookOn,renewOn);
+
         if(differenceBefore > 7){
-            Long penalization = getDifferenceBetweenDays(realReturn2,dueDate);
+            Long penalization = getDifferenceBetweenDays(dueDate,renewOn);
             book.setIsAvailable(true);
             user.setBorrowedBooks(user.getBorrowedBooks()-1);
             bookRecord.setIsReturned(true);
-            bookRecord.setReturnOn(new Date());
-            bookRecord.setDelayPenalization((penalization)*0.20);
-
+            bookRecord.setReturnOn(renewOn);
+            bookRecord.setDelayPenalization((penalization)*Constants.PENALIZATION);
             return bookRecordRepository.save(bookRecord);
         }
 
-        bookRecord.setTookOn(new Date());
+        bookRecord.setTookOn(renewOn);
         bookRecord.setDueDate(dueDateUpdated);
         bookRecord.setRenewalCont(bookRecord.getRenewalCont()+1);
-        Date realReturn = new Date();
-
 
         if(bookRecord.getRenewalCont() >= 3){
-            Long difference = getDifferenceBetweenDays(bookRecord.getDueDate(), realReturn);
-            bookRecord.setDelayPenalization((difference)*0.20);
-            bookRecord.setReturnOn(returnOn);
+            bookRecord.setReturnOn(renewOn);
             bookRecord.setIsReturned(true);
             book.setIsAvailable(true);
             user.setBorrowedBooks(user.getBorrowedBooks()-1);
@@ -179,8 +143,6 @@ public class BookRecordService {
         bookRecordToUpdate.setIsReturned(bookRecord.getIsReturned());
         bookRecordToUpdate.setRenewalCont(bookRecord.getRenewalCont());
         bookRecordToUpdate.setDelayPenalization(bookRecord.getDelayPenalization());
-        //TODO BookID
-        //TODO UserId
 
         return bookRecordRepository.save(bookRecordToUpdate);
     }
@@ -195,8 +157,33 @@ public class BookRecordService {
     }
 
     public Long getDifferenceBetweenDays(Date date1, Date date2) {
-        Long days = date1.getTime() - date2.getTime();
+        long days = date2.getTime() - date1.getTime();
         return TimeUnit.DAYS.convert(days, TimeUnit.MILLISECONDS);
+    }
+
+    public void validateEntries(BookRecord bookRecord, Book book, User user, Integer invoice, String isbn, Integer userCode){
+        if (bookRecord == null) {
+            throw new ResourceNotCreatedException("The invoice #" + invoice + " does not exist");
+        } else if (book == null) {
+            throw new ResourceNotFoundException("The book with ISBN: " + isbn + " does not exists");
+        } else if (user == null) {
+            throw new ResourceNotFoundException("The user with id: " + userCode + " does not exists");
+        } else if (bookRecord.getIsReturned()) {
+            throw new ResourceNotCreatedException("The book: " + book.getTitle() + " has been already returned");
+        } else if(!bookRecord.getBook().getBookId().equals(book.getBookId())){
+            throw new ResourceNotCreatedException("This book does not exist in the current invoice #"+invoice);
+        } else if(!bookRecord.getUser().getUserId().equals(user.getUserId())){
+            throw new ResourceNotCreatedException("This user does not exist in the current invoice #"+invoice);
+        }
+    }
+
+    public Date sumSevenDays(Date today){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        dateFormat.format(today);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.DATE,7);
+        return calendar.getTime();
     }
 
     //TODO Individual update methods?

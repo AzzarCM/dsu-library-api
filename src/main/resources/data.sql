@@ -1,5 +1,6 @@
 INSERT INTO USER_TYPE (USERTYPE_ID, USER_TYPE)
-VALUES (1, 'Student');
+VALUES (1, 'Student'),
+        (2, 'Teacher');
 
 INSERT INTO USER (USER_ID, BORROWED_BOOKS, EMAIL, FIRST_NAME, LAST_NAME, PHONE, USER_CODE, USERTYPE_ID)
 VALUES (1, 3, 'cris.mundo@outlook.com', 'Cristian', 'Mundo', '(503) 7678-3896', 86917, 1);

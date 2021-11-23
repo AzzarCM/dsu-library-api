@@ -25,7 +25,7 @@ public class User {
     private String firstName;
     @NotNull(message = "The last name is required")
     private String lastName;
-
+    @NotNull(message = "the books is required")
     private Integer borrowedBooks;
     @NotNull(message = "the email is required")
     private String email;

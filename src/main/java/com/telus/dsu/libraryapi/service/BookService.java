@@ -34,6 +34,7 @@ public class BookService {
         toUpdateBook.setTitle(book.getTitle());
         toUpdateBook.setIsAvailable(book.getIsAvailable());
         toUpdateBook.setCategory(book.getCategory());
+        toUpdateBook.setAuthor(book.getAuthor());
 
         return bookRepository.save(toUpdateBook);
     }

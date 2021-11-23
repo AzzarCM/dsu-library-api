@@ -28,6 +28,7 @@ public class Book {
     private String author;
     @NotNull(message = "the ISBN is required")
     private String category;
+    @NotNull(message = "the ISBN is required")
     private Boolean isAvailable;
 
     @JsonIgnore

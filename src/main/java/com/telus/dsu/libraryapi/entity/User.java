@@ -37,7 +37,7 @@ public class User {
     private UserType userType;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<BookRecord> bookRecordList;
 
     public User(Integer userId) {

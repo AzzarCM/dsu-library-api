@@ -31,7 +31,7 @@ public class Book {
     private Boolean isAvailable;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<BookRecord> bookRecordList;
 
     public Book(Integer bookId) {

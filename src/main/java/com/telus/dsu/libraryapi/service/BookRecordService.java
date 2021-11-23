@@ -85,7 +85,7 @@ public class BookRecordService {
         Date returnOn = new Date();
 
         Long difference = getDifferenceBetweenDays(tookOn, returnOn);
-        if (difference > 7) {
+        if (difference > 0) {
             Long diffForPenalization = getDifferenceBetweenDays(dueDate, returnOn);
             bookRecord.setDelayPenalization((diffForPenalization) * Constants.PENALIZATION);
         }

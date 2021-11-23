@@ -63,7 +63,7 @@ public class BookRecordController {
                                          @PathVariable String isbn,
                                          @PathVariable Integer userCode){
         BookRecord record = bookRecordService.returnBook(invoice,isbn,userCode);
-        return new ResponseEntity<>(record, HttpStatus.OK);
+        return new ResponseEntity<>(convertToDTO(record), HttpStatus.OK);
     }
 
     @PostMapping("/renew/{invoice}/{isbn}/{userCode}")
@@ -71,7 +71,7 @@ public class BookRecordController {
                                        @PathVariable String isbn,
                                        @PathVariable Integer userCode){
         BookRecord record = bookRecordService.renewBook(invoice,isbn,userCode);
-        return new ResponseEntity<>(record,HttpStatus.OK);
+        return new ResponseEntity<>(convertToDTO(record),HttpStatus.OK);
     }
 
     @PutMapping("/{transaction}")

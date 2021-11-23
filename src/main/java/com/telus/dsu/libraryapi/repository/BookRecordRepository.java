@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRecordRepository extends JpaRepository<BookRecord, Integer> {
     BookRecord findBookRecordByTransaction(Integer transaction);
-    BookRecord findBookRecordByBookBookIdAndUserUserIdAndIsReturnedFalse(Integer bookId, Integer userId);
     //TODO FindBy date, user??
 }

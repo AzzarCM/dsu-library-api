@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@SpringBootTest
+@SpringBootTest(classes = LibraryApiApplication.class)
 @RunWith(SpringJUnit4ClassRunner.class)
 class LibraryApiApplicationTests {
 
@@ -28,16 +28,16 @@ class LibraryApiApplicationTests {
         UserType userType = userTypeService.getUserTypeById(1);
         User user = new User();
         user.setUserType(userType);
-        user.setUserCode(2135);
+        user.setUserCode(21356);
         user.setFirstName("Camila");
         user.setLastName("Celeste");
         user.setEmail("camiy@gmail.com");
         user.setPhone("2277-7777");
+        user.setBorrowedBooks(0);
         userService.createUser(user);
-        User getUser = userService.getUserByCode(2135);
+        User getUser = userService.getUserByCode(21356);
         MatcherAssert.assertThat(getUser.getFirstName(),equalTo("Camila"));
     }
-
 
 
     @Test

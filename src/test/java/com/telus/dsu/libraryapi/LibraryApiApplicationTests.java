@@ -1,12 +1,12 @@
 package com.telus.dsu.libraryapi;
 import static org.mockito.Mockito.mock;
 
+import com.telus.dsu.libraryapi.controller.BookRecordController;
 import com.telus.dsu.libraryapi.entity.BookRecord;
 import com.telus.dsu.libraryapi.exception.ResourceNotCreatedException;
 import com.telus.dsu.libraryapi.service.BookRecordService;
 import org.apache.logging.log4j.core.util.Assert;
 import com.telus.dsu.libraryapi.controller.BookController;
-import com.telus.dsu.libraryapi.entity.dto.BookDTO;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import com.telus.dsu.libraryapi.entity.Book;
@@ -19,7 +19,6 @@ import org.hamcrest.MatcherAssert;
 import static org.hamcrest.Matchers.equalTo;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
-import org.omg.CORBA.portable.ApplicationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +42,9 @@ class LibraryApiApplicationTests {
 
     @Autowired
     private BookRecordService bookRecordService;
+
+    @Autowired
+    private BookRecordController bookRecordController;
 
     @Test
     void createUser(){
@@ -81,7 +83,7 @@ class LibraryApiApplicationTests {
     }
 
     @Test
-    void createBookRecord(){
+    void createBookRecordWhenMaxBorrows(){
         ResourceNotCreatedException thrown = Assertions.assertThrows(ResourceNotCreatedException.class, () ->{
             Book book = bookRepository.findBookByIsbn("3399"); //getting data from data.sql
             User user = userService.getUserByCode(86917); //getting data from data.sql
@@ -94,6 +96,42 @@ class LibraryApiApplicationTests {
 
         });
         Assertions.assertEquals("User has already borrow 3 books", thrown.getMessage());
+    }
+
+    @Test
+    void createBookRecordWhenTransactionExists(){
+        ResourceNotCreatedException exception = Assertions.assertThrows(ResourceNotCreatedException.class, () ->{
+            Book book = bookRepository.findBookByIsbn("1988"); //getting data from data.sql
+            User user = userService.getUserByCode(2021); //getting data from data.sql
+
+            BookRecord bookRecord = new BookRecord();
+            bookRecord.setBook(book);
+            bookRecord.setUser(user);
+            bookRecord.setTransaction(1000); //this transaction is already on database
+            bookRecordService.createBookRecord(bookRecord,"1988",2021);
+        });
+        Assertions.assertEquals("Invoice #1000 already exists", exception.getMessage());
+    }
+
+    @Test
+    void createBookRecord(){
+        //with
+        Book book = bookRepository.findBookByIsbn("1988");
+        User user = userService.getUserByCode(2021);
+        BookRecord bookRecord = new BookRecord();
+        bookRecord.setBook(book);
+        bookRecord.setUser(user);
+        bookRecord.setTransaction(2021);
+        bookRecordService.createBookRecord(bookRecord,"1988",2021);
+        BookRecordService bookRecordServiceMOCK = mock(BookRecordService.class);
+
+        //when
+        Mockito.when(bookRecordServiceMOCK.getBookRecordByTransaction(2021)).thenReturn(bookRecord);
+        ResponseEntity<?> bookRecordDTO = bookRecordController.getBookRecordByTransaction(2021);
+
+        //then
+        Assert.isNonEmpty(bookRecordDTO);
+
     }
 
     @Test

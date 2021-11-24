@@ -48,10 +48,10 @@ public class BookRecordService {
             throw new ResourceNotFoundException("Book with ISBN " + isbn + " does not exist");
         } else if (user == null) {
             throw new ResourceNotFoundException("User with code #" + userCode + " does not exist");
-        } else if (!book.getIsAvailable()) {
-            throw new ResourceNotCreatedException("Book is not available");
         } else if (user.getBorrowedBooks() >= Constants.MAX_BOOKS_PER_USER) {
             throw new ResourceNotCreatedException("User has already borrow 3 books");
+        } else if (!book.getIsAvailable()) {
+            throw new ResourceNotCreatedException("Book is not available");
         }
 
         Date currentDataPlusSeven = sumSevenDays(new Date());
@@ -74,7 +74,7 @@ public class BookRecordService {
         BookRecord bookRecord = bookRecordRepository.findBookRecordByTransaction(invoice);
         Book book = bookRepository.findBookByIsbn(isbn);
         User user = userRepository.findByUserCode(userCode);
-        validateEntries(bookRecord,book,user,invoice,isbn,userCode);
+        validateEntries(bookRecord, book, user, invoice, isbn, userCode);
         user.setBorrowedBooks(user.getBorrowedBooks() - 1);
         book.setIsAvailable(true);
         bookRecord.setIsReturned(true);
@@ -92,42 +92,42 @@ public class BookRecordService {
         return bookRecordRepository.save(bookRecord);
     }
 
-    public BookRecord renewBook(Integer invoice, String isbn, Integer userCode){
+    public BookRecord renewBook(Integer invoice, String isbn, Integer userCode) {
         BookRecord bookRecord = bookRecordRepository.findBookRecordByTransaction(invoice);
         Book book = bookRepository.findBookByIsbn(isbn);
         User user = userRepository.findByUserCode(userCode);
 
-        validateEntries(bookRecord,book,user,invoice,isbn,userCode);
+        validateEntries(bookRecord, book, user, invoice, isbn, userCode);
 
         Date dueDateUpdated = sumSevenDays(new Date());
 
         Date tookOn = bookRecord.getTookOn();
         Date dueDate = bookRecord.getDueDate();
         Date renewOn = new Date();
-        Long differenceBefore = getDifferenceBetweenDays(tookOn,renewOn);
+        Long differenceBefore = getDifferenceBetweenDays(tookOn, renewOn);
 
-        if(differenceBefore > 7){
-            Long penalization = getDifferenceBetweenDays(dueDate,renewOn);
+        if (differenceBefore > 7) {
+            Long penalization = getDifferenceBetweenDays(dueDate, renewOn);
             book.setIsAvailable(true);
-            user.setBorrowedBooks(user.getBorrowedBooks()-1);
+            user.setBorrowedBooks(user.getBorrowedBooks() - 1);
             bookRecord.setIsReturned(true);
             bookRecord.setReturnOn(renewOn);
-            bookRecord.setDelayPenalization((penalization)*Constants.PENALIZATION);
+            bookRecord.setDelayPenalization((penalization) * Constants.PENALIZATION);
             return bookRecordRepository.save(bookRecord);
         }
 
         bookRecord.setTookOn(renewOn);
         bookRecord.setDueDate(dueDateUpdated);
-        bookRecord.setRenewalCont(bookRecord.getRenewalCont()+1);
+        bookRecord.setRenewalCont(bookRecord.getRenewalCont() + 1);
 
-        if(bookRecord.getRenewalCont() > Constants.MAX_RENEWALS){
+        if (bookRecord.getRenewalCont() > Constants.MAX_RENEWALS) {
             bookRecord.setReturnOn(renewOn);
             bookRecord.setIsReturned(true);
             book.setIsAvailable(true);
-            user.setBorrowedBooks(user.getBorrowedBooks()-1);
-            bookRecord.setRenewalCont(bookRecord.getRenewalCont()-1);
+            user.setBorrowedBooks(user.getBorrowedBooks() - 1);
+            bookRecord.setRenewalCont(bookRecord.getRenewalCont() - 1);
             bookRecordRepository.save(bookRecord);
-            throw new ResourceNotCreatedException("User "+userCode+"has reach maximum renewals for the book: "+book.getTitle());
+            throw new ResourceNotCreatedException("User " + userCode + "has reach maximum renewals for the book: " + book.getTitle());
         }
 
         return bookRecordRepository.save(bookRecord);
@@ -151,7 +151,7 @@ public class BookRecordService {
             throw new ResourceNotFoundException("BookRecord not found with BookRecordId: " + transaction);
         } else {
             User user = userRepository.findByUserId(bookRecordFound.getUser().getUserId());
-            user.setBorrowedBooks(user.getBorrowedBooks()-1);
+            user.setBorrowedBooks(user.getBorrowedBooks() - 1);
             Book book = bookRepository.findByBookId(bookRecordFound.getBook().getBookId());
             book.setIsAvailable(true);
             bookRecordRepository.delete(bookRecordFound);
@@ -163,7 +163,7 @@ public class BookRecordService {
         return TimeUnit.DAYS.convert(days, TimeUnit.MILLISECONDS);
     }
 
-    public void validateEntries(BookRecord bookRecord, Book book, User user, Integer invoice, String isbn, Integer userCode){
+    public void validateEntries(BookRecord bookRecord, Book book, User user, Integer invoice, String isbn, Integer userCode) {
         if (bookRecord == null) {
             throw new ResourceNotCreatedException("The invoice #" + invoice + " does not exist");
         } else if (book == null) {
@@ -172,19 +172,19 @@ public class BookRecordService {
             throw new ResourceNotFoundException("The user with id: " + userCode + " does not exists");
         } else if (bookRecord.getIsReturned()) {
             throw new ResourceNotCreatedException("The book: " + book.getTitle() + " has been already returned");
-        } else if(!bookRecord.getBook().getBookId().equals(book.getBookId())){
-            throw new ResourceNotCreatedException("This book does not exist in the current invoice #"+invoice);
-        } else if(!bookRecord.getUser().getUserId().equals(user.getUserId())){
-            throw new ResourceNotCreatedException("This user does not exist in the current invoice #"+invoice);
+        } else if (!bookRecord.getBook().getBookId().equals(book.getBookId())) {
+            throw new ResourceNotCreatedException("This book does not exist in the current invoice #" + invoice);
+        } else if (!bookRecord.getUser().getUserId().equals(user.getUserId())) {
+            throw new ResourceNotCreatedException("This user does not exist in the current invoice #" + invoice);
         }
     }
 
-    public Date sumSevenDays(Date today){
+    public Date sumSevenDays(Date today) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         dateFormat.format(today);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
-        calendar.add(Calendar.DATE,7);
+        calendar.add(Calendar.DATE, 7);
         return calendar.getTime();
     }
 

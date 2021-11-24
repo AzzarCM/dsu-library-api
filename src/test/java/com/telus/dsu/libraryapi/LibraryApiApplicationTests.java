@@ -93,7 +93,7 @@ class LibraryApiApplicationTests {
             bookRecordService.createBookRecord(bookRecord,"3399",86917);
 
         });
-        Assertions.assertEquals("Book is not available", thrown.getMessage());
+        Assertions.assertEquals("User has already borrow 3 books", thrown.getMessage());
     }
 
     @Test

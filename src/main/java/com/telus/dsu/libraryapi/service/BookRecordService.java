@@ -101,16 +101,9 @@ public class BookRecordService {
 
         Date dueDateUpdated = sumSevenDays(new Date());
 
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-        Calendar c = Calendar.getInstance();
-
         Date tookOn = bookRecord.getTookOn();
         Date dueDate = bookRecord.getDueDate();
         Date renewOn = new Date();
-//        dateFormat.format(renewOn);
-//        c.setTime(renewOn);
-//        c.add(Calendar.DATE, 7);
-//        Date realReturn = c.getTime();
         Long differenceBefore = getDifferenceBetweenDays(tookOn,renewOn);
 
         if(differenceBefore > 7){
@@ -127,11 +120,14 @@ public class BookRecordService {
         bookRecord.setDueDate(dueDateUpdated);
         bookRecord.setRenewalCont(bookRecord.getRenewalCont()+1);
 
-        if(bookRecord.getRenewalCont() >= Constants.MAX_RENEWALS){
+        if(bookRecord.getRenewalCont() > Constants.MAX_RENEWALS){
             bookRecord.setReturnOn(renewOn);
             bookRecord.setIsReturned(true);
             book.setIsAvailable(true);
             user.setBorrowedBooks(user.getBorrowedBooks()-1);
+            bookRecord.setRenewalCont(bookRecord.getRenewalCont()-1);
+            bookRecordRepository.save(bookRecord);
+            throw new ResourceNotCreatedException("User "+userCode+"has reach maximum renewals for the book: "+book.getTitle());
         }
 
         return bookRecordRepository.save(bookRecord);

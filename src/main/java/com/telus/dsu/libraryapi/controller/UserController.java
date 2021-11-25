@@ -72,6 +72,12 @@ public class UserController {
         return new ResponseEntity<>("User with UserCode " + userCode + "deleted", HttpStatus.OK);
     }
 
+    @PutMapping("/deactivate/{userCode}")
+    public ResponseEntity<?> deactivateUser(@PathVariable Integer userCode) {
+        userService.deactivateUser(userCode);
+        return new ResponseEntity<>("User with UserCode " + userCode + "deactivated", HttpStatus.OK);
+    }
+
     private List<UserDTO> convertListToDTO(List<User> users){
         List<UserDTO> userDTOList = new ArrayList<>();
         for(User user : users){

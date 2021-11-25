@@ -31,6 +31,9 @@ public class User {
     private String email;
     @NotNull(message = "the phone is required")
     private String phone;
+    @NotNull(message = "the isActive is required")
+    private Boolean isActive;
+
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "USERTYPE_ID")

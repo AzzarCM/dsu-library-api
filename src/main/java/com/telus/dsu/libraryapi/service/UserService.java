@@ -1,9 +1,12 @@
 package com.telus.dsu.libraryapi.service;
 
+import com.telus.dsu.libraryapi.entity.Book;
+import com.telus.dsu.libraryapi.entity.BookRecord;
 import com.telus.dsu.libraryapi.entity.User;
 import com.telus.dsu.libraryapi.entity.UserType;
 import com.telus.dsu.libraryapi.exception.ResourceNotCreatedException;
 import com.telus.dsu.libraryapi.exception.ResourceNotFoundException;
+import com.telus.dsu.libraryapi.repository.BookRecordRepository;
 import com.telus.dsu.libraryapi.repository.UserRepository;
 import com.telus.dsu.libraryapi.repository.UserTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BookRecordRepository recordRepository;
 
     @Autowired
     private UserTypeRepository userTypeRepository;
@@ -49,6 +55,7 @@ public class UserService {
         toUpdateUser.setEmail(user.getEmail());
         toUpdateUser.setPhone(user.getPhone());
         toUpdateUser.setUserType(user.getUserType());
+        toUpdateUser.setIsActive(user.getIsActive());
 
         return userRepository.save(toUpdateUser);
     }
@@ -59,6 +66,32 @@ public class UserService {
             throw new ResourceNotFoundException("User not found with User Code: " + userCode);
         }else{
             userRepository.delete(userFound);
+        }
+    }
+
+    public void deactivateUser(Integer userCode) {
+        User userFound = userRepository.findByUserCode(userCode);
+        if(userFound == null){
+            throw new ResourceNotFoundException("User not found with User Code: " + userCode);
+        }else{
+            if(!userFound.getIsActive()){
+                throw new ResourceNotCreatedException("User with ID: "+userFound.getUserCode()+ " is not active");
+            }
+
+            List<BookRecord> records = recordRepository.findAllBookRecordByUserUserCode(userCode);
+
+            int cont = 0;
+            for(BookRecord record: records) {
+                if(!record.getIsReturned()){
+                    cont++;
+                }
+            }
+
+            if(cont > 0){
+                throw new ResourceNotCreatedException("User with ID: "+userFound.getUserCode()+ " has not returned " + cont + " books, please return the books and try again");
+            }
+            userFound.setIsActive(false);
+            userRepository.save(userFound);
         }
     }
 

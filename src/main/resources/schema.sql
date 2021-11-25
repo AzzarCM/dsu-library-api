@@ -17,6 +17,7 @@ CREATE TABLE USER
     FIRST_NAME     varchar(45) NOT NULL,
     LAST_NAME      varchar(45) NOT NULL,
     PHONE          varchar(45) NOT NULL,
+    IS_ACTIVE      BOOLEAN DEFAULT TRUE,
     USER_CODE      INTEGER     NOT NULL UNIQUE,
     USERTYPE_ID    int(11) NOT NULL,
     PRIMARY KEY (USER_ID),

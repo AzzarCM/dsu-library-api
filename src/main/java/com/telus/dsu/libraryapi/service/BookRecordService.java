@@ -46,8 +46,8 @@ public class BookRecordService {
         User user = userRepository.findByUserCode(userCode);
         if (book == null) {
             throw new ResourceNotFoundException("Book with ISBN " + isbn + " does not exist");
-        } else if (user == null) {
-            throw new ResourceNotFoundException("User with code #" + userCode + " does not exist");
+        } else if (user == null || !user.getIsActive()) {
+            throw new ResourceNotFoundException("User with code #" + userCode + " does not exist or is deactivated");
         } else if (user.getBorrowedBooks() >= Constants.MAX_BOOKS_PER_USER) {
             throw new ResourceNotCreatedException("User has already borrow 3 books");
         } else if (!book.getIsAvailable()) {
@@ -74,6 +74,7 @@ public class BookRecordService {
         BookRecord bookRecord = bookRecordRepository.findBookRecordByTransaction(invoice);
         Book book = bookRepository.findBookByIsbn(isbn);
         User user = userRepository.findByUserCode(userCode);
+
         validateEntries(bookRecord, book, user, invoice, isbn, userCode);
         user.setBorrowedBooks(user.getBorrowedBooks() - 1);
         book.setIsAvailable(true);
@@ -168,8 +169,8 @@ public class BookRecordService {
             throw new ResourceNotCreatedException("The invoice #" + invoice + " does not exist");
         } else if (book == null) {
             throw new ResourceNotFoundException("The book with ISBN: " + isbn + " does not exists");
-        } else if (user == null) {
-            throw new ResourceNotFoundException("The user with id: " + userCode + " does not exists");
+        } else if (user == null || !user.getIsActive()) {
+            throw new ResourceNotFoundException("The user with id: " + userCode + " does not exists or is deactivated");
         } else if (bookRecord.getIsReturned()) {
             throw new ResourceNotCreatedException("The book: " + book.getTitle() + " has been already returned");
         } else if (!bookRecord.getBook().getBookId().equals(book.getBookId())) {

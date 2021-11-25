@@ -14,6 +14,7 @@ public class UserDTO {
     private Integer borrowedBooks;
     private String email;
     private String phone;
+    private Boolean isActive;
     private Integer userTypeId;
 
     public UserDTO() {

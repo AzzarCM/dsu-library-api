@@ -89,6 +89,8 @@ public class BookRecordService {
         if (difference > 7) {
             Long diffForPenalization = getDifferenceBetweenDays(dueDate, returnOn);
             bookRecord.setDelayPenalization((diffForPenalization) * Constants.PENALIZATION);
+            bookRecordRepository.save(bookRecord);
+            throw new ResourceNotCreatedException("User: "+userCode+" has delay of "+diffForPenalization+"days, penalization applied");
         }
         return bookRecordRepository.save(bookRecord);
     }
@@ -114,7 +116,9 @@ public class BookRecordService {
             bookRecord.setIsReturned(true);
             bookRecord.setReturnOn(renewOn);
             bookRecord.setDelayPenalization((penalization) * Constants.PENALIZATION);
-            return bookRecordRepository.save(bookRecord);
+            bookRecordRepository.save(bookRecord);
+            throw new ResourceNotCreatedException("The user has delay, the book: "+book.getTitle()+" was returned");
+
         }
 
         bookRecord.setTookOn(renewOn);

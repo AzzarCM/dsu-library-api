@@ -6,7 +6,7 @@ INSERT INTO USER (USER_ID, BORROWED_BOOKS, EMAIL, FIRST_NAME, LAST_NAME, PHONE, 
 VALUES (1, 3, 'cris.mundo@outlook.com', 'Cristian', 'Mundo', '(503) 7678-3896', 86917, 1);
 
 INSERT INTO BOOK (BOOK_ID, AUTHOR, CATEGORY, IS_AVAILABLE, ISBN, TITLE)
-VALUES (1, 'Agatha Christie', 'Mistery', false, 3399, 'Los diez negritos');
+VALUES (1, 'Agatha Christie', 'Mistery', true, 3399, 'Los diez negritos');
 INSERT INTO BOOK (BOOK_ID, AUTHOR, CATEGORY, IS_AVAILABLE, ISBN, TITLE)
 VALUES (2, 'Will Smith', 'Biography', false, 2577, 'Will');
 INSERT INTO BOOK (BOOK_ID, AUTHOR, CATEGORY, IS_AVAILABLE, ISBN, TITLE)
@@ -22,4 +22,4 @@ VALUES (2, null, '2021-11-27', false, 1, null, '2021-11-20', 2000, 2, 1);
 
 INSERT INTO BOOK_RECORD (RECORD_ID, DELAY_PENALIZATION, DUE_DATE, IS_RETURNED, RENEWAL_CONT, RETURN_ON, TOOK_ON,
                          TRANSACTION_NUMBER, BOOK_BOOK_ID, USER_USER_ID)
-VALUES (3, null, '2021-11-20', false, 0, null, '2021-11-18', 3000, 3, 1);
+VALUES (3, null, '2021-11-25', false, 0, null, '2021-11-18', 3000, 3, 1);
